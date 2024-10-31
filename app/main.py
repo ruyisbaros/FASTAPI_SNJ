@@ -42,8 +42,8 @@ class Post(BaseModel):
 my_posts2 = []
 
 
-####### GET ALL POSTS #####
-###########################
+########## GET ALL POSTS ##########
+###################################
 @app.get("/posts")
 def get_posts():
     cursor.execute("""SELECT * FROM posts""")
@@ -52,8 +52,8 @@ def get_posts():
     return {"data": my_posts}
 
 
-###### CREATE A NEW POST #######
-################################
+######### CREATE A NEW POST #########
+#####################################
 @app.post("/posts", status_code=status.HTTP_201_CREATED)
 def create_post(new_post: Post):
     cursor.execute(
@@ -67,8 +67,8 @@ def create_post(new_post: Post):
     return {"message": "New post created successfully", "data": new_post}
 
 
-###### GET A POST WITH RELEVANT ID #################
-####################################################
+######### GET A POST WITH RELEVANT ID #################
+#######################################################
 @app.get("/posts/{id}")
 def get_post(id: int, res: Response):
     print(id)
@@ -80,6 +80,7 @@ def get_post(id: int, res: Response):
             (str(id)),
         )
         post = cursor.fetchone()
+
         if post is None:
             # Raise a 404 error if the post does not exist
             raise HTTPException(
@@ -94,17 +95,22 @@ def get_post(id: int, res: Response):
         )
 
 
-# Delete post with  relevant id
+###### DELETE A POST WITH RELEVANT ID #################
+#######################################################
 @app.delete("/posts/{id}", status_code=status.HTTP_204_NO_CONTENT)
 def delete_post(id: int):
     try:
-        post = None
+        cursor.execute(
+            """DELETE FROM posts WHERE post_id = %s returning * """,
+            (str(id)),
+        )
+        post = cursor.fetchone()
         if post is None:
             # Raise a 404 error if the post does not exist
             raise HTTPException(
                 status_code=status.HTTP_404_NOT_FOUND, detail="Post not found"
             )
-        my_posts2.remove(post)
+        conn.commit()
         return Response(status_code=status.HTTP_204_NO_CONTENT)
     except Exception as e:
         raise HTTPException(
@@ -113,22 +119,25 @@ def delete_post(id: int):
         )
 
 
-# Update  post with relevant id
+###### UPDATE A POST WITH RELEVANT ID #################
+#######################################################
 @app.put("/posts/{id}", status_code=status.HTTP_200_OK)
 def update_post(id: int, updated_post: Post):
     try:
-        post = None
-        if post is None:
+        cursor.execute(
+            """update posts set title=%s WHERE post_id = %s returning * """,
+            (updated_post.title, str(id)),
+        )
+        post = cursor.fetchone()
+
+        if post is None:  # Check if the post exists
             # Raise a 404 error if the post does not exist
             raise HTTPException(
                 status_code=status.HTTP_404_NOT_FOUND, detail="Post not found"
             )
-        print(post)
-        updated_post_dict = updated_post.model_dump()
-        post["title"] = updated_post_dict["title"]
-        print(post)
+        conn.commit()
         # post.update(updated_post_dict)
-        return {"message": "Post updated successfully", "updated post": post}
+        return {"message": "Post updated successfully", "data": post}
     except Exception as e:
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
