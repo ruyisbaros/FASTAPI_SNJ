@@ -51,7 +51,9 @@ class Post(BaseModel):
 ###################################
 @app.get("/posts")
 def get_posts(db: Session = Depends(get_db)):
-    my_posts = db.query(models.Post).all()
+    cursor.execute("""SELECT * FROM posts""")
+    my_posts = cursor.fetchall()
+    # print(my_posts)
     return {"data": my_posts}
 
 
