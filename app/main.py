@@ -75,10 +75,7 @@ def get_post(id: int, res: Response):
     print(type(id))
     try:
         # Attempt to retrieve the post from the 'database'
-        cursor.execute(
-            """SELECT * FROM posts WHERE post_id = %s""",
-            (str(id)),
-        )
+        cursor.execute("""SELECT * FROM posts WHERE post_id = %s""", (id,))
         post = cursor.fetchone()
 
         if post is None:
@@ -102,7 +99,7 @@ def delete_post(id: int):
     try:
         cursor.execute(
             """DELETE FROM posts WHERE post_id = %s returning * """,
-            (str(id)),
+            (id,),
         )
         post = cursor.fetchone()
         if post is None:
@@ -126,7 +123,7 @@ def update_post(id: int, updated_post: Post):
     try:
         cursor.execute(
             """update posts set title=%s WHERE post_id = %s returning * """,
-            (updated_post.title, str(id)),
+            (updated_post.title, id),
         )
         post = cursor.fetchone()
 
