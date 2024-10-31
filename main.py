@@ -106,8 +106,11 @@ def update_post(id: int, updated_post: Post):
             raise HTTPException(
                 status_code=status.HTTP_404_NOT_FOUND, detail="Post not found"
             )
+        print(post)
         updated_post_dict = updated_post.model_dump()
-        post.update(updated_post_dict)
+        post["title"] = updated_post_dict["title"]
+        print(post)
+        # post.update(updated_post_dict)
         return {"message": "Post updated successfully", "updated post": post}
     except Exception as e:
         raise HTTPException(
