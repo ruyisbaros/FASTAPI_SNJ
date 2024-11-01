@@ -6,7 +6,7 @@ from psycopg2.extras import RealDictCursor
 
 from . import models
 from .database import engine
-from .routers import postRoutes, userRoutes
+from .routers import authRoutes, postRoutes, userRoutes
 
 # LOCAL SERVER
 app = FastAPI()
@@ -38,3 +38,4 @@ while True:
 ### SET ROUTES
 app.include_router(postRoutes.router)
 app.include_router(userRoutes.router)
+app.include_router(authRoutes.router)
