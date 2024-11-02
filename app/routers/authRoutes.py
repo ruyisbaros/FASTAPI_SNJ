@@ -1,25 +1,28 @@
 from typing import List
 
-from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi import APIRouter, Depends, HTTPException, Response, status
+from fastapi.responses import JSONResponse
+from fastapi.security.oauth2 import OAuth2PasswordRequestForm
 from sqlalchemy.orm import Session
 
 from .. import models, schemas
 from ..database import get_db
+from ..oauth2 import create_access_token
 from ..utils import get_password_hash, verify_password
 
 router = APIRouter(prefix="/auth", tags=["Auth"])
 
 
 # response_model=schemas.UserCreate
-@router.post("/login", response_model=schemas.UserOut)
-async def login(
-    user_credentials: schemas.UserLogin,
+@router.post("/login")
+def login(
+    user_credentials: OAuth2PasswordRequestForm = Depends(),
     db: Session = Depends(get_db),
 ):
     # Check if user exists
     loggedIn = (
         db.query(models.User)
-        .filter(models.User.email == user_credentials.email)
+        .filter(models.User.email == user_credentials.username)
         .first()
     )
 
@@ -35,5 +38,11 @@ async def login(
             status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid credentials"
         )
     # Create access token
+    access_token = create_access_token(
+        data={"user_id": loggedIn.id, "email": loggedIn.email}
+    )
 
-    return loggedIn
+    return {
+        "token_type": "bearer",
+        "access_token": access_token,
+    }

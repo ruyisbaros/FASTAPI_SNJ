@@ -3,7 +3,7 @@ from typing import List
 from fastapi import APIRouter, Depends, HTTPException, Response, status
 from sqlalchemy.orm import Session
 
-from .. import models, schemas
+from .. import models, oauth2, schemas
 from ..database import get_db
 
 router = APIRouter(prefix="/posts", tags=["Posts"])
@@ -20,7 +20,12 @@ def get_posts(db: Session = Depends(get_db)):
 ######### CREATE A NEW POST #########
 #####################################
 @router.post("/", status_code=status.HTTP_201_CREATED, response_model=schemas.Post)
-def create_post(new_post: schemas.PostCreate, db: Session = Depends(get_db)):
+def create_post(
+    new_post: schemas.PostCreate,
+    db: Session = Depends(get_db),
+    payload: dict = Depends(oauth2.get_current_user),
+):
+    print(payload)
     new_post = models.Post(**new_post.model_dump())
     db.add(new_post)
     db.commit()
@@ -52,7 +57,11 @@ def get_post(id: int, db: Session = Depends(get_db)):
 ###### DELETE A POST WITH RELEVANT ID #################
 #######################################################
 @router.delete("/{id}", status_code=status.HTTP_204_NO_CONTENT)
-def delete_post(id: int, db: Session = Depends(get_db)):
+def delete_post(
+    id: int,
+    db: Session = Depends(get_db),
+    payload: dict = Depends(oauth2.get_current_user),
+):
     try:
         post_query = db.query(models.Post).filter(models.Post.id == id)
         post = post_query.first()  # Fetch the post from the database
@@ -75,7 +84,10 @@ def delete_post(id: int, db: Session = Depends(get_db)):
 #######################################################
 @router.put("/{id}", status_code=status.HTTP_200_OK, response_model=schemas.Post)
 def update_post(
-    id: int, updated_post: schemas.PostCreate, db: Session = Depends(get_db)
+    id: int,
+    updated_post: schemas.PostCreate,
+    db: Session = Depends(get_db),
+    payload: dict = Depends(oauth2.get_current_user),
 ):
     try:
         post_query = db.query(models.Post).filter(models.Post.id == id)
