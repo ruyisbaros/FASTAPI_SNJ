@@ -25,8 +25,11 @@ def create_post(
     db: Session = Depends(get_db),
     payload: dict = Depends(oauth2.get_current_user),
 ):
-    print(payload)
-    new_post = models.Post(**new_post.model_dump())
+    # print(payload)
+    new_post = new_post.model_dump()
+    new_post["owner_id"] = payload["user_id"]
+    new_post = models.Post(**new_post)
+
     db.add(new_post)
     db.commit()
     db.refresh(new_post)
