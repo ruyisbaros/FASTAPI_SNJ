@@ -4,7 +4,7 @@ from . import models
 
 # from .config import settings
 from .database import engine
-from .routers import authRoutes, postRoutes, userRoutes
+from .routers import authRoutes, postRoutes, userRoutes, voteRoutes
 
 # LOCAL SERVER
 app = FastAPI()
@@ -17,3 +17,4 @@ models.Base.metadata.create_all(bind=engine)
 app.include_router(postRoutes.router)
 app.include_router(userRoutes.router)
 app.include_router(authRoutes.router)
+app.include_router(voteRoutes.router)

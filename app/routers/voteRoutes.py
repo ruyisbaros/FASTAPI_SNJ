@@ -13,6 +13,7 @@ def vote(
     db: Session = Depends(get_db),
     payload: dict = Depends(oauth2.get_current_user),
 ):
+    print(new_vote)
     # Check whether  the post exists or  not
     voted_post = (
         db.query(models.Post).filter(models.Post.id == new_vote.post_id).first()
@@ -21,6 +22,7 @@ def vote(
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND, detail="Post not found"
         )
+    print(voted_post)
     vote_query = db.query(models.Votes).filter(
         models.Votes.post_id == new_vote.post_id,
         models.Votes.user_id == payload["user_id"],
@@ -31,9 +33,7 @@ def vote(
             raise HTTPException(
                 status_code=status.HTTP_409_CONFLICT, detail="Already voted"
             )
-        new_vote = new_vote.model_dump()
-        new_vote["user_id"] = payload["user_id"]
-        new_vote = models.Votes(**new_vote)
+        new_vote = models.Votes(post_id=new_vote.post_id, user_id=payload["user_id"])
 
         db.add(new_vote)
         db.commit()
