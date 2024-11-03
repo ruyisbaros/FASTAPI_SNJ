@@ -1,4 +1,5 @@
 from sqlalchemy import Boolean, Column, ForeignKey, Integer, String
+from sqlalchemy.orm import relationship
 from sqlalchemy.sql.expression import text
 from sqlalchemy.sql.sqltypes import TIMESTAMP
 
@@ -23,6 +24,7 @@ class Post(Base):
         index=True,
         nullable=False,
     )
+    owner = relationship("User")
 
 
 class User(Base):
