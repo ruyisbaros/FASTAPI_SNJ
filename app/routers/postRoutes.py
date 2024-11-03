@@ -26,6 +26,7 @@ def create_post(
     payload: dict = Depends(oauth2.get_current_user),
 ):
     # print(payload)
+    # Add logged in user's ID with getting from Token payload and add it to the newly created  post
     new_post = new_post.model_dump()
     new_post["owner_id"] = payload["user_id"]
     new_post = models.Post(**new_post)
@@ -68,14 +69,21 @@ def delete_post(
     try:
         post_query = db.query(models.Post).filter(models.Post.id == id)
         post = post_query.first()  # Fetch the post from the database
+
         if post is None:
             # Raise a 404 error if the post does not exist
             raise HTTPException(
                 status_code=status.HTTP_404_NOT_FOUND, detail="Post not found"
             )
+        if payload["user_id"] != post.owner_id:
+            raise HTTPException(
+                status_code=status.HTTP_403_FORBIDDEN,
+                detail="You can delete only your own post",
+            )
         post_query.delete(synchronize_session=False)
         db.commit()
         return Response(status_code=status.HTTP_204_NO_CONTENT)
+
     except Exception as e:
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
@@ -99,6 +107,11 @@ def update_post(
             # Raise a 404 error if the post does not exist
             raise HTTPException(
                 status_code=status.HTTP_404_NOT_FOUND, detail="Post not found"
+            )
+        if payload["user_id"] != post.owner_id:
+            raise HTTPException(
+                status_code=status.HTTP_403_FORBIDDEN,
+                detail="You can update only your own post",
             )
         post_query.update(updated_post.model_dump(), synchronize_session=False)
         db.commit()
