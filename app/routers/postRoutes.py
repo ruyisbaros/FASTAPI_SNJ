@@ -11,20 +11,13 @@ router = APIRouter(prefix="/posts", tags=["Posts"])
 
 ########## GET ALL POSTS ##########
 ###################################
+# select posts.*, count(votes.post_id) as votes_count from posts left join votes on posts.id=votes.post_id group by posts.id;
 @router.get("/", response_model=List[schemas.Post])
 def get_posts(
     db: Session = Depends(get_db),
-    limit: int = 5,
-    skip: int = 0,
-    search: Optional[str] = "",
 ):
-    my_posts = (
-        db.query(models.Post)
-        .filter(models.Post.title.contains(search))
-        .limit(limit)
-        .offset(skip)
-        .all()
-    )
+    my_posts = db.query(models.Post)
+    print(my_posts)
     return my_posts
 
 
