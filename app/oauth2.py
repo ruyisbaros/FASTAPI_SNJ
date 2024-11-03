@@ -1,13 +1,14 @@
+import os
 from datetime import datetime, timedelta
 
+from dotenv import load_dotenv
 from fastapi import Depends, HTTPException, Request, status
 from fastapi.security import OAuth2PasswordBearer
 from jose import JWTError, jwt
 
-from .schemas import TokenData
+load_dotenv()
 
-# Set your own secret key and algorithm
-SECRET_KEY = "dfhgfn875454&!&&54389??&$§§§§§§§§"
+SECRET_KEY = os.getenv("SECRET_KEY")
 
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="auth/login")
 

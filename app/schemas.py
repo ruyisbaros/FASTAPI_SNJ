@@ -62,3 +62,9 @@ class TokenData(BaseModel):
 
 
 #### VOTE/ LIKE ######
+
+
+class Vote(BaseModel):
+    post_id: int
+    user_id: int
+    vote_dir: int = 1

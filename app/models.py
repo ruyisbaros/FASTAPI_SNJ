@@ -43,3 +43,22 @@ class User(Base):
         index=True,
         nullable=False,
     )
+
+
+class Votes(Base):
+    __tablename__ = "votes"
+    # id = Column(Integer, primary_key=True, index=True, nullable=False)
+    user_id = Column(
+        Integer,
+        ForeignKey("users.id", ondelete="CASCADE"),
+        nullable=False,
+        index=True,
+        primary_key=True,
+    )
+    post_id = Column(
+        Integer,
+        ForeignKey("posts.id", ondelete="CASCADE"),
+        nullable=False,
+        index=True,
+        primary_key=True,
+    )
