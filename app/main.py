@@ -7,7 +7,7 @@ from . import models
 from .database import engine
 from .routers import authRoutes, postRoutes, userRoutes, voteRoutes
 
-# LOCAL SERVER
+# LOCAL SERVER git test
 app = FastAPI()
 
 # CORSMiddleware
