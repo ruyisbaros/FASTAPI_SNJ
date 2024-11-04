@@ -1,4 +1,5 @@
 from fastapi import FastAPI
+from fastapi.middleware.cors import CORSMiddleware
 
 from . import models
 
@@ -9,8 +10,18 @@ from .routers import authRoutes, postRoutes, userRoutes, voteRoutes
 # LOCAL SERVER
 app = FastAPI()
 
+# CORSMiddleware
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+
 # RUNS ORM
-models.Base.metadata.create_all(bind=engine)
+# I use Alembic so I disabled below
+# models.Base.metadata.create_all(bind=engine)
 
 
 ### SET ROUTES
