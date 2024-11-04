@@ -48,6 +48,14 @@ class Post(PostBase):
         orm_mode = True
 
 
+class PostWithVotes(PostBase):
+    Post: Post
+    votes: int
+
+    class Config:
+        orm_mode = True
+
+
 #### Tokens
 
 
