@@ -185,3 +185,4 @@ cython_debug/
 *trainer_state*
 *spiece.model*
 *.pptx
+*.ini
